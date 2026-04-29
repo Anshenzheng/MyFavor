@@ -157,7 +157,7 @@
   </div>
 
   <!-- Lightbox -->
-  <ng-container *ngIf="lightboxOpen && figure && figure.images; let f = figure">
+  <ng-container *ngIf="lightboxOpen && figure && figure.images">
     <div
       class="lightbox-overlay"
       (click)="closeLightbox()"
@@ -168,27 +168,27 @@
         <button
           class="lightbox-nav lightbox-prev"
           (click)="prevImage()"
-          *ngIf="f.images.length > 1"
+          *ngIf="figure.images!.length > 1"
         >
           ‹
         </button>
 
         <img
           class="lightbox-image"
-          [src]="getImageUrl(f.images[currentImageIndex])"
-          [alt]="f.name"
+          [src]="getImageUrl(figure.images![currentImageIndex])"
+          [alt]="figure.name"
         />
 
         <button
           class="lightbox-nav lightbox-next"
           (click)="nextImage()"
-          *ngIf="f.images.length > 1"
+          *ngIf="figure.images!.length > 1"
         >
           ›
         </button>
 
-        <div class="lightbox-counter" *ngIf="f.images.length > 1">
-          {{ currentImageIndex + 1 }} / {{ f.images.length }}
+        <div class="lightbox-counter" *ngIf="figure.images!.length > 1">
+          {{ currentImageIndex + 1 }} / {{ figure.images!.length }}
         </div>
       </div>
     </div>
