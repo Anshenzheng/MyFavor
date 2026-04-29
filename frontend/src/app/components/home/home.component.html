@@ -1,0 +1,173 @@
+<div class="home-page">
+  <!-- Hero Section -->
+  <section class="hero-section">
+    <div class="container">
+      <div class="hero-content">
+        <h1 class="hero-title">发现精彩手办世界</h1>
+        <p class="hero-subtitle">在「手办阁」展示你的收藏，发现更多精彩</p>
+        <div class="hero-search">
+          <input
+            type="text"
+            class="form-control"
+            placeholder="搜索手办..."
+            [(ngModel)]="searchKeyword"
+            (keyup.enter)="search()"
+          />
+          <button class="btn btn-primary" (click)="search()">搜索</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Popular Figures -->
+  <section class="section" *ngIf="popularFigures.length > 0">
+    <div class="container">
+      <div class="section-header">
+        <h2 class="section-title">🔥 热门榜单</h2>
+        <p class="section-desc">最受欢迎的手办收藏</p>
+      </div>
+      <div class="popular-grid">
+        <div
+          class="popular-card"
+          *ngFor="let figure of popularFigures; let i = index"
+          (click)="viewFigure(figure)"
+        >
+          <div class="popular-rank">{{ i + 1 }}</div>
+          <img
+            [src]="getImageUrl(figure.primaryImage)"
+            [alt]="figure.name"
+            class="popular-image"
+          />
+          <div class="popular-info">
+            <h3 class="popular-name">{{ figure.name }}</h3>
+            <div class="popular-stats">
+              <span class="stat-item">❤️ {{ figure.likeCount }}</span>
+              <span class="stat-item">👁️ {{ figure.viewCount }}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- All Figures -->
+  <section class="section">
+    <div class="container">
+      <div class="section-header">
+        <h2 class="section-title">
+          {{ isSearching ? '🔍 搜索结果' : '🖼️ 展示墙' }}
+        </h2>
+        <p class="section-desc">
+          {{ isSearching ? '搜索: "' + searchKeyword + '"' : '所有公开的手办收藏' }}
+          <span *ngIf="totalElements > 0"> (共 {{ totalElements }} 件)</span>
+        </p>
+        <button
+          *ngIf="isSearching"
+          class="btn btn-outline btn-sm"
+          (click)="clearSearch()"
+        >
+          清除搜索
+        </button>
+      </div>
+
+      <div *ngIf="loading" class="loading">
+        <div class="spinner"></div>
+      </div>
+
+      <div *ngIf="!loading && allFigures.length === 0" class="empty-state">
+        <div class="empty-state-icon">📭</div>
+        <h3 class="empty-state-title">暂无手办</h3>
+        <p class="empty-state-text">
+          {{ isSearching ? '没有找到相关手办，试试其他关键词' : '还没有手办，快来分享你的收藏吧' }}
+        </p>
+      </div>
+
+      <div class="figure-grid" *ngIf="!loading && allFigures.length > 0">
+        <div
+          class="figure-card"
+          *ngFor="let figure of allFigures"
+          (click)="viewFigure(figure)"
+        >
+          <div class="figure-card-image-container">
+            <img
+              [src]="getImageUrl(figure.primaryImage)"
+              [alt]="figure.name"
+              class="figure-card-image"
+            />
+            <div class="figure-card-overlay">
+              <span class="badge badge-primary">查看详情</span>
+            </div>
+          </div>
+          <div class="figure-card-content">
+            <h3 class="figure-card-title">{{ figure.name }}</h3>
+            <div class="figure-card-meta">
+              <span
+                class="user-link"
+                (click)="$event.stopPropagation(); viewUserFigures(figure.userId)"
+              >
+                by {{ figure.username }}
+              </span>
+              <span class="category-tag" *ngIf="figure.categoryName">
+                {{ figure.categoryName }}
+              </span>
+            </div>
+            <div class="figure-card-stats">
+              <div class="figure-card-stat">
+                <span>❤️</span>
+                <span>{{ figure.likeCount }}</span>
+              </div>
+              <div class="figure-card-stat">
+                <span>👁️</span>
+                <span>{{ figure.viewCount }}</span>
+              </div>
+              <div class="figure-card-stat">
+                <span>⭐</span>
+                <span>{{ figure.wantCount }}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Pagination -->
+      <div *ngIf="totalPages > 1" class="pagination">
+        <button
+          class="pagination-btn"
+          (click)="pageChanged(0)"
+          [disabled]="currentPage === 0"
+        >
+          ««
+        </button>
+        <button
+          class="pagination-btn"
+          (click)="pageChanged(currentPage - 1)"
+          [disabled]="currentPage === 0"
+        >
+          ‹
+        </button>
+        <button
+          *ngFor="let page of pages"
+          class="pagination-btn"
+          [class.active]="page === currentPage"
+          (click)="pageChanged(page)"
+        >
+          {{ page + 1 }}
+        </button>
+        <button
+          class="pagination-btn"
+          (click)="pageChanged(currentPage + 1)"
+          [disabled]="currentPage >= totalPages - 1"
+        >
+          ›
+        </button>
+        <button
+          class="pagination-btn"
+          (click)="pageChanged(totalPages - 1)"
+          [disabled]="currentPage >= totalPages - 1"
+        >
+          »»
+        </button>
+      </div>
+    </div>
+  </section>
+</div>

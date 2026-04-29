@@ -1,0 +1,228 @@
+<div class="form-page">
+  <div class="container">
+    <!-- Loading -->
+    <div *ngIf="loading" class="loading">
+      <div class="spinner"></div>
+    </div>
+
+    <!-- Form Content -->
+    <ng-container *ngIf="!loading">
+      <!-- Header -->
+      <div class="form-header">
+        <h1 class="page-title">
+          {{ isEdit ? '✏️ 编辑手办' : '➕ 添加手办' }}
+        </h1>
+        <p class="page-subtitle">
+          {{ isEdit ? '修改手办的详细信息' : '添加新的手办到你的收藏' }}
+        </p>
+      </div>
+
+      <!-- Form -->
+      <form [formGroup]="figureForm" (ngSubmit)="onSubmit()" class="figure-form">
+        <!-- Basic Info Section -->
+        <div class="form-section">
+          <h2 class="section-title">基本信息</h2>
+          
+          <div class="form-row">
+            <div class="form-group full-width">
+              <label class="form-label">手办名称 <span class="required">*</span></label>
+              <input
+                type="text"
+                formControlName="name"
+                class="form-control"
+                [class.error]="figureForm.get('name')?.invalid && figureForm.get('name')?.touched"
+                placeholder="请输入手办名称"
+              />
+              <div
+                *ngIf="figureForm.get('name')?.invalid && figureForm.get('name')?.touched"
+                class="form-error"
+              >
+                <span *ngIf="figureForm.get('name')?.errors?.['required']">请输入手办名称</span>
+                <span *ngIf="figureForm.get('name')?.errors?.['maxlength']">名称不能超过100个字符</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group full-width">
+              <label class="form-label">描述</label>
+              <textarea
+                formControlName="description"
+                class="form-control textarea"
+                rows="4"
+                placeholder="请输入手办描述（可选）"
+              ></textarea>
+              <div
+                *ngIf="figureForm.get('description')?.invalid"
+                class="form-error"
+              >
+                描述不能超过2000个字符
+              </div>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">价格</label>
+              <input
+                type="number"
+                formControlName="price"
+                class="form-control"
+                placeholder="请输入价格（可选）"
+                step="0.01"
+                min="0"
+              />
+            </div>
+            <div class="form-group">
+              <label class="form-label">购入日期</label>
+              <input
+                type="date"
+                formControlName="purchaseDate"
+                class="form-control"
+              />
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">分类</label>
+              <select formControlName="categoryId" class="form-control">
+                <option [ngValue]="null">选择分类（可选）</option>
+                <option *ngFor="let category of categories" [ngValue]="category.id">
+                  {{ category.name }}
+                </option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">展示状态</label>
+              <div class="toggle-group">
+                <label class="toggle-label">
+                  <input type="radio" formControlName="isPublic" [value]="true" />
+                  <span class="toggle-text">公开</span>
+                </label>
+                <label class="toggle-label">
+                  <input type="radio" formControlName="isPublic" [value]="false" />
+                  <span class="toggle-text">私密</span>
+                </label>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Images Section -->
+        <div class="form-section">
+          <h2 class="section-title">图片上传 <span class="required">*</span></h2>
+          <p class="section-desc">请上传手办图片（至少1张，支持多选）</p>
+
+          <div class="upload-area">
+            <input
+              type="file"
+              id="fileInput"
+              accept="image/*"
+              multiple
+              (change)="onFileChange($event)"
+              style="display: none"
+            />
+            <label for="fileInput" class="upload-btn">
+              <span class="upload-icon">📷</span>
+              <span class="upload-text">点击或拖拽上传图片</span>
+              <span class="upload-hint">支持 JPG、PNG、GIF、WebP 格式</span>
+            </label>
+          </div>
+
+          <!-- Image Preview -->
+          <div *ngIf="uploadedImages.length > 0" class="image-preview-grid">
+            <div
+              class="image-preview-item"
+              *ngFor="let image of uploadedImages; let i = index"
+              [class.primary]="i === primaryImageIndex"
+            >
+              <img [src]="getImageUrl(image)" alt="预览图" class="preview-image" />
+              <div class="preview-actions">
+                <button
+                  type="button"
+                  class="preview-btn primary-btn"
+                  *ngIf="i !== primaryImageIndex"
+                  (click)="setPrimaryImage(i)"
+                  title="设为主图"
+                >
+                  🎯
+                </button>
+                <span class="primary-badge" *ngIf="i === primaryImageIndex">主图</span>
+                <button
+                  type="button"
+                  class="preview-btn remove-btn"
+                  (click)="removeImage(i)"
+                  title="删除"
+                >
+                  ✕
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <div *ngIf="uploadedImages.length === 0" class="form-error">
+            请至少上传一张图片
+          </div>
+        </div>
+
+        <!-- Tags Section -->
+        <div class="form-section">
+          <h2 class="section-title">标签</h2>
+          <p class="section-desc">为手办添加标签，方便分类和检索</p>
+
+          <div class="tags-input-area">
+            <div class="selected-tags">
+              <span class="tag" *ngFor="let tag of selectedTags">
+                {{ tag }}
+                <span class="tag-remove" (click)="removeTag(tag)">&times;</span>
+              </span>
+            </div>
+            <div class="tag-input-wrapper">
+              <input
+                type="text"
+                class="form-control"
+                placeholder="输入标签后按回车添加"
+                [(ngModel)]="newTag"
+                (keyup.enter)="addTag()"
+                [ngModelOptions]="{ standalone: true }"
+              />
+              <button type="button" class="btn btn-primary btn-sm" (click)="addTag()">
+                添加
+              </button>
+            </div>
+          </div>
+
+          <!-- Suggested Tags -->
+          <div *ngIf="tags.length > 0" class="suggested-tags">
+            <span class="suggested-label">常用标签：</span>
+            <button
+              type="button"
+              class="btn btn-outline btn-sm"
+              *ngFor="let tag of tags"
+              (click)="if (!selectedTags.includes(tag.name)) selectedTags.push(tag.name)"
+              [disabled]="selectedTags.includes(tag.name)"
+            >
+              {{ tag.name }}
+            </button>
+          </div>
+        </div>
+
+        <!-- Submit Buttons -->
+        <div class="form-actions">
+          <button type="button" class="btn btn-secondary btn-lg" (click)="cancel()">
+            取消
+          </button>
+          <button
+            type="submit"
+            class="btn btn-primary btn-lg"
+            [disabled]="submitting"
+          >
+            <span *ngIf="submitting" class="spinner-small"></span>
+            {{ submitting ? '保存中...' : (isEdit ? '保存修改' : '添加手办') }}
+          </button>
+        </div>
+      </form>
+    </ng-container>
+  </div>
+</div>

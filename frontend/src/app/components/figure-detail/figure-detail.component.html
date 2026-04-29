@@ -1,0 +1,195 @@
+<div class="figure-detail-page">
+  <div class="container">
+    <!-- Loading -->
+    <div *ngIf="loading" class="loading">
+      <div class="spinner"></div>
+    </div>
+
+    <!-- Not Found -->
+    <div *ngIf="!loading && !figure" class="empty-state">
+      <div class="empty-state-icon">❓</div>
+      <h3 class="empty-state-title">手办不存在</h3>
+      <p class="empty-state-text">该手办可能已被删除或不存在</p>
+      <button class="btn btn-primary" routerLink="/">返回首页</button>
+    </div>
+
+    <!-- Detail Content -->
+    <ng-container *ngIf="!loading && figure">
+      <!-- Breadcrumb -->
+      <div class="breadcrumb">
+        <a routerLink="/">首页</a>
+        <span class="separator">/</span>
+        <span class="current">{{ figure.name }}</span>
+      </div>
+
+      <!-- Main Content -->
+      <div class="detail-content">
+        <!-- Image Section -->
+        <div class="image-section">
+          <div class="main-image" (click)="openLightbox(0)">
+            <img
+              [src]="getImageUrl(figure.primaryImage)"
+              [alt]="figure.name"
+            />
+            <div class="zoom-hint">
+              <span>🔍 点击放大</span>
+            </div>
+          </div>
+
+          <!-- Thumbnails -->
+          <div class="thumbnail-list" *ngIf="figure.images && figure.images.length > 1">
+            <div
+              class="thumbnail"
+              *ngFor="let image of figure.images; let i = index"
+              [class.active]="i === 0"
+              (click)="openLightbox(i)"
+            >
+              <img [src]="getImageUrl(image)" [alt]="figure.name" />
+            </div>
+          </div>
+        </div>
+
+        <!-- Info Section -->
+        <div class="info-section">
+          <div class="info-header">
+            <h1 class="figure-name">{{ figure.name }}</h1>
+            <div class="figure-meta">
+              <span
+                class="user-link"
+                (click)="viewUserFigures(figure.userId)"
+              >
+                by {{ figure.username }}
+              </span>
+              <span class="badge badge-primary" *ngIf="figure.categoryName">
+                {{ figure.categoryName }}
+              </span>
+              <span class="badge badge-success" *ngIf="figure.isPublic">
+                公开
+              </span>
+              <span class="badge badge-warning" *ngIf="!figure.isPublic">
+                私密
+              </span>
+            </div>
+          </div>
+
+          <!-- Stats -->
+          <div class="stats-row">
+            <div class="stat-item">
+              <div class="stat-icon">👁️</div>
+              <div class="stat-value">{{ figure.viewCount }}</div>
+              <div class="stat-label">浏览</div>
+            </div>
+            <div class="stat-item" (click)="toggleLike()">
+              <div class="stat-icon" [class.active]="figure.isLiked">
+                {{ figure.isLiked ? '❤️' : '🤍' }}
+              </div>
+              <div class="stat-value">{{ figure.likeCount }}</div>
+              <div class="stat-label">点赞</div>
+            </div>
+            <div class="stat-item" (click)="toggleWant()">
+              <div class="stat-icon" [class.active]="figure.isWanted">
+                {{ figure.isWanted ? '⭐' : '☆' }}
+              </div>
+              <div class="stat-value">{{ figure.wantCount }}</div>
+              <div class="stat-label">想要</div>
+            </div>
+          </div>
+
+          <!-- Action Buttons -->
+          <div class="action-buttons">
+            <button
+              class="btn btn-lg"
+              [ngClass]="figure.isLiked ? 'btn-danger' : 'btn-outline'"
+              (click)="toggleLike()"
+            >
+              {{ figure.isLiked ? '❤️ 已点赞' : '🤍 点赞' }}
+            </button>
+            <button
+              class="btn btn-lg"
+              [ngClass]="figure.isWanted ? 'btn-primary' : 'btn-outline'"
+              (click)="toggleWant()"
+            >
+              {{ figure.isWanted ? '⭐ 已标记想要' : '☆ 标记想要' }}
+            </button>
+            <button
+              *ngIf="canEdit()"
+              class="btn btn-secondary btn-lg"
+              (click)="editFigure()"
+            >
+              ✏️ 编辑
+            </button>
+          </div>
+
+          <!-- Details -->
+          <div class="details-section">
+            <div class="detail-row" *ngIf="figure.price">
+              <div class="detail-label">价格</div>
+              <div class="detail-value">¥{{ figure.price }}</div>
+            </div>
+            <div class="detail-row" *ngIf="figure.purchaseDate">
+              <div class="detail-label">购入日期</div>
+              <div class="detail-value">{{ figure.purchaseDate }}</div>
+            </div>
+            <div class="detail-row" *ngIf="figure.createdAt">
+              <div class="detail-label">添加时间</div>
+              <div class="detail-value">{{ formatDate(figure.createdAt) }}</div>
+            </div>
+          </div>
+
+          <!-- Tags -->
+          <div class="tags-section" *ngIf="figure.tagNames && figure.tagNames.length > 0">
+            <div class="section-subtitle">标签</div>
+            <div class="tags-list">
+              <span class="tag" *ngFor="let tag of figure.tagNames">
+                {{ tag }}
+              </span>
+            </div>
+          </div>
+
+          <!-- Description -->
+          <div class="description-section" *ngIf="figure.description">
+            <div class="section-subtitle">描述</div>
+            <div class="description-text">{{ figure.description }}</div>
+          </div>
+        </div>
+      </div>
+    </ng-container>
+  </div>
+
+  <!-- Lightbox -->
+  <div
+    *ngIf="lightboxOpen && figure?.images"
+    class="lightbox-overlay"
+    (click)="closeLightbox()"
+  >
+    <div class="lightbox-content" (click)="$event.stopPropagation()">
+      <button class="lightbox-close" (click)="closeLightbox()">×</button>
+
+      <button
+        class="lightbox-nav lightbox-prev"
+        (click)="prevImage()"
+        *ngIf="figure.images.length > 1"
+      >
+        ‹
+      </button>
+
+      <img
+        class="lightbox-image"
+        [src]="getImageUrl(figure.images[currentImageIndex])"
+        [alt]="figure.name"
+      />
+
+      <button
+        class="lightbox-nav lightbox-next"
+        (click)="nextImage()"
+        *ngIf="figure.images.length > 1"
+      >
+        ›
+      </button>
+
+      <div class="lightbox-counter" *ngIf="figure.images.length > 1">
+        {{ currentImageIndex + 1 }} / {{ figure.images.length }}
+      </div>
+    </div>
+  </div>
+</div>

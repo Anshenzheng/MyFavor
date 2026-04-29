@@ -1,0 +1,157 @@
+<div class="manage-page">
+  <div class="container">
+    <!-- Header -->
+    <div class="manage-header">
+      <div class="header-left">
+        <h1 class="page-title">我的手办</h1>
+        <p class="page-subtitle">管理你的手办收藏 (共 {{ totalElements }} 件)</p>
+      </div>
+      <div class="header-right">
+        <button class="btn btn-primary btn-lg" (click)="addFigure()">
+          ➕ 添加手办
+        </button>
+      </div>
+    </div>
+
+    <!-- Search -->
+    <div class="search-bar">
+      <div class="search-input-wrapper">
+        <input
+          type="text"
+          class="form-control"
+          placeholder="搜索手办..."
+          [(ngModel)]="searchKeyword"
+          (keyup.enter)="search()"
+        />
+        <button class="btn btn-primary btn-sm" (click)="search()">搜索</button>
+        <button *ngIf="searchKeyword" class="btn btn-outline btn-sm" (click)="clearSearch()">
+          清除
+        </button>
+      </div>
+    </div>
+
+    <!-- Loading -->
+    <div *ngIf="loading" class="loading">
+      <div class="spinner"></div>
+    </div>
+
+    <!-- Empty State -->
+    <div *ngIf="!loading && figures.length === 0" class="empty-state">
+      <div class="empty-state-icon">📦</div>
+      <h3 class="empty-state-title">
+        {{ searchKeyword ? '没有找到相关手办' : '还没有添加手办' }}
+      </h3>
+      <p class="empty-state-text">
+        {{ searchKeyword ? '试试其他关键词' : '快来添加你的第一件手办收藏吧！' }}
+      </p>
+      <button *ngIf="!searchKeyword" class="btn btn-primary" (click)="addFigure()">
+        添加手办
+      </button>
+    </div>
+
+    <!-- Figures Grid -->
+    <div *ngIf="!loading && figures.length > 0" class="manage-grid">
+      <div class="manage-card" *ngFor="let figure of figures">
+        <div class="manage-card-image" (click)="viewFigure(figure)">
+          <img
+            [src]="getImageUrl(figure.primaryImage)"
+            [alt]="figure.name"
+          />
+          <div class="manage-card-badges">
+            <span
+              class="badge"
+              [ngClass]="figure.isPublic ? 'badge-success' : 'badge-warning'"
+            >
+              {{ figure.isPublic ? '公开' : '私密' }}
+            </span>
+          </div>
+        </div>
+        <div class="manage-card-content">
+          <h3 class="manage-card-title" (click)="viewFigure(figure)">{{ figure.name }}</h3>
+          <div class="manage-card-meta">
+            <span *ngIf="figure.categoryName" class="category-tag">
+              {{ figure.categoryName }}
+            </span>
+            <span class="price" *ngIf="figure.price">
+              ¥{{ figure.price }}
+            </span>
+          </div>
+          <div class="manage-card-stats">
+            <span class="stat">❤️ {{ figure.likeCount }}</span>
+            <span class="stat">👁️ {{ figure.viewCount }}</span>
+            <span class="stat">⭐ {{ figure.wantCount }}</span>
+          </div>
+          <div class="manage-card-actions">
+            <button class="btn btn-outline btn-sm" (click)="viewFigure(figure)">
+              查看
+            </button>
+            <button class="btn btn-primary btn-sm" (click)="editFigure(figure)">
+              编辑
+            </button>
+            <button class="btn btn-danger btn-sm" (click)="openDeleteModal(figure)">
+              删除
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Pagination -->
+    <div *ngIf="totalPages > 1" class="pagination">
+      <button
+        class="pagination-btn"
+        (click)="pageChanged(0)"
+        [disabled]="currentPage === 0"
+      >
+        ««
+      </button>
+      <button
+        class="pagination-btn"
+        (click)="pageChanged(currentPage - 1)"
+        [disabled]="currentPage === 0"
+      >
+        ‹
+      </button>
+      <button
+        *ngFor="let page of pages"
+        class="pagination-btn"
+        [class.active]="page === currentPage"
+        (click)="pageChanged(page)"
+      >
+        {{ page + 1 }}
+      </button>
+      <button
+        class="pagination-btn"
+        (click)="pageChanged(currentPage + 1)"
+        [disabled]="currentPage >= totalPages - 1"
+      >
+        ›
+      </button>
+      <button
+        class="pagination-btn"
+        (click)="pageChanged(totalPages - 1)"
+        [disabled]="currentPage >= totalPages - 1"
+      >
+        »»
+      </button>
+    </div>
+  </div>
+
+  <!-- Delete Confirmation Modal -->
+  <div *ngIf="showDeleteModal" class="modal-overlay" (click)="closeDeleteModal()">
+    <div class="modal-content" (click)="$event.stopPropagation()">
+      <button class="modal-close" (click)="closeDeleteModal()">×</button>
+      <div class="modal-header">
+        <h3 class="modal-title">确认删除</h3>
+      </div>
+      <div class="modal-body">
+        <p>确定要删除手办 <strong>{{ figureToDelete?.name }}</strong> 吗？</p>
+        <p class="warning-text">此操作无法撤销，将永久删除该手办及其所有相关数据。</p>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" (click)="closeDeleteModal()">取消</button>
+        <button class="btn btn-danger" (click)="confirmDelete()">确认删除</button>
+      </div>
+    </div>
+  </div>
+</div>

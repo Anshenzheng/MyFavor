@@ -1,0 +1,59 @@
+<div class="app-container">
+  <!-- Header -->
+  <header class="header">
+    <div class="container header-content">
+      <a routerLink="/" class="logo">
+        <span class="logo-icon">🏛️</span>
+        <span class="logo-text">手办阁</span>
+      </a>
+
+      <nav class="nav">
+        <a routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }" class="nav-link">
+          展示墙
+        </a>
+        <a *ngIf="isLoggedIn" routerLink="/manage" routerLinkActive="active" class="nav-link">
+          我的手办
+        </a>
+      </nav>
+
+      <div class="auth-section">
+        <ng-container *ngIf="isLoggedIn; else guestLinks">
+          <span class="user-name">{{ currentUser?.username }}</span>
+          <button (click)="logout()" class="btn btn-outline btn-sm">
+            退出登录
+          </button>
+        </ng-container>
+        <ng-template #guestLinks>
+          <a routerLink="/login" class="btn btn-outline btn-sm">登录</a>
+          <a routerLink="/register" class="btn btn-primary btn-sm">注册</a>
+        </ng-template>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Content -->
+  <main class="main-content">
+    <router-outlet></router-outlet>
+  </main>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-content">
+        <div class="footer-logo">
+          <span class="logo-icon">🏛️</span>
+          <span class="logo-text">手办阁</span>
+        </div>
+        <p class="footer-text">个人手办电子橱窗，分享你的收藏世界</p>
+      </div>
+      <div class="footer-bottom">
+        <p>© 2024 手办阁. All rights reserved.</p>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Toast -->
+  <div *ngIf="toast" class="toast toast-{{ toast.type }}">
+    {{ toast.message }}
+  </div>
+</div>
