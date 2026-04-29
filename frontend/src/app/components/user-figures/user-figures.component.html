@@ -1,0 +1,121 @@
+<div class="user-figures-page">
+  <div class="container">
+    <!-- Loading -->
+    <div *ngIf="loading" class="loading">
+      <div class="spinner"></div>
+    </div>
+
+    <!-- Content -->
+    <ng-container *ngIf="!loading">
+      <!-- Header -->
+      <div class="page-header">
+        <div class="user-info">
+          <div class="user-avatar">
+            {{ username ? username.charAt(0).toUpperCase() : '?' }}
+          </div>
+          <div class="user-detail">
+            <h1 class="user-name">{{ username || '用户' }} 的收藏</h1>
+            <p class="user-stats">
+              共 {{ totalElements }} 件手办
+            </p>
+          </div>
+        </div>
+        <button class="btn btn-outline" routerLink="/">
+          ← 返回首页
+        </button>
+      </div>
+
+      <!-- Empty State -->
+      <div *ngIf="figures.length === 0" class="empty-state">
+        <div class="empty-state-icon">📭</div>
+        <h3 class="empty-state-title">该用户暂无公开手办</h3>
+        <p class="empty-state-text">这个用户还没有分享任何手办收藏</p>
+      </div>
+
+      <!-- Figures Grid -->
+      <div *ngIf="figures.length > 0" class="figure-grid">
+        <div
+          class="figure-card"
+          *ngFor="let figure of figures"
+          (click)="viewFigure(figure)"
+        >
+          <div class="figure-card-image-container">
+            <img
+              [src]="getImageUrl(figure.primaryImage)"
+              [alt]="figure.name"
+              class="figure-card-image"
+            />
+            <div class="figure-card-overlay">
+              <span class="badge badge-primary">查看详情</span>
+            </div>
+          </div>
+          <div class="figure-card-content">
+            <h3 class="figure-card-title">{{ figure.name }}</h3>
+            <div class="figure-card-meta">
+              <span class="category-tag" *ngIf="figure.categoryName">
+                {{ figure.categoryName }}
+              </span>
+              <span class="price" *ngIf="figure.price">
+                ¥{{ figure.price }}
+              </span>
+            </div>
+            <div class="figure-card-stats">
+              <div class="figure-card-stat">
+                <span>❤️</span>
+                <span>{{ figure.likeCount }}</span>
+              </div>
+              <div class="figure-card-stat">
+                <span>👁️</span>
+                <span>{{ figure.viewCount }}</span>
+              </div>
+              <div class="figure-card-stat">
+                <span>⭐</span>
+                <span>{{ figure.wantCount }}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Pagination -->
+      <div *ngIf="totalPages > 1" class="pagination">
+        <button
+          class="pagination-btn"
+          (click)="pageChanged(0)"
+          [disabled]="currentPage === 0"
+        >
+          ««
+        </button>
+        <button
+          class="pagination-btn"
+          (click)="pageChanged(currentPage - 1)"
+          [disabled]="currentPage === 0"
+        >
+          ‹
+        </button>
+        <button
+          *ngFor="let page of pages"
+          class="pagination-btn"
+          [class.active]="page === currentPage"
+          (click)="pageChanged(page)"
+        >
+          {{ page + 1 }}
+        </button>
+        <button
+          class="pagination-btn"
+          (click)="pageChanged(currentPage + 1)"
+          [disabled]="currentPage >= totalPages - 1"
+        >
+          ›
+        </button>
+        <button
+          class="pagination-btn"
+          (click)="pageChanged(totalPages - 1)"
+          [disabled]="currentPage >= totalPages - 1"
+        >
+          »»
+        </button>
+      </div>
+    </ng-container>
+  </div>
+</div>

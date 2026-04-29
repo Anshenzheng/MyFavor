@@ -1,0 +1,125 @@
+<div class="auth-page">
+  <div class="auth-container">
+    <div class="auth-card">
+      <div class="auth-header">
+        <div class="auth-icon">✨</div>
+        <h1 class="auth-title">注册</h1>
+        <p class="auth-subtitle">创建你的手办阁账号</p>
+      </div>
+
+      <form [formGroup]="registerForm" (ngSubmit)="onSubmit()" class="auth-form">
+        <div class="form-group">
+          <label class="form-label">用户名</label>
+          <input
+            type="text"
+            formControlName="username"
+            class="form-control"
+            [class.error]="submitted && f['username'].invalid"
+            placeholder="请输入用户名 (3-50个字符)"
+          />
+          <div
+            *ngIf="submitted && f['username'].invalid"
+            class="form-error"
+          >
+            <span *ngIf="f['username'].errors?.['required']">请输入用户名</span>
+            <span *ngIf="f['username'].errors?.['minlength']">用户名至少3个字符</span>
+            <span *ngIf="f['username'].errors?.['maxlength']">用户名不能超过50个字符</span>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">邮箱</label>
+          <input
+            type="email"
+            formControlName="email"
+            class="form-control"
+            [class.error]="submitted && f['email'].invalid"
+            placeholder="请输入邮箱地址"
+          />
+          <div
+            *ngIf="submitted && f['email'].invalid"
+            class="form-error"
+          >
+            <span *ngIf="f['email'].errors?.['required']">请输入邮箱</span>
+            <span *ngIf="f['email'].errors?.['email']">请输入有效的邮箱地址</span>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">密码</label>
+          <input
+            type="password"
+            formControlName="password"
+            class="form-control"
+            [class.error]="submitted && f['password'].invalid"
+            placeholder="请输入密码 (至少6个字符)"
+          />
+          <div
+            *ngIf="submitted && f['password'].invalid"
+            class="form-error"
+          >
+            <span *ngIf="f['password'].errors?.['required']">请输入密码</span>
+            <span *ngIf="f['password'].errors?.['minlength']">密码至少6个字符</span>
+            <span *ngIf="f['password'].errors?.['maxlength']">密码不能超过100个字符</span>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">确认密码</label>
+          <input
+            type="password"
+            formControlName="confirmPassword"
+            class="form-control"
+            [class.error]="submitted && (f['confirmPassword'].invalid || registerForm.errors?.['passwordMismatch'])"
+            placeholder="请再次输入密码"
+          />
+          <div
+            *ngIf="submitted && (f['confirmPassword'].invalid || registerForm.errors?.['passwordMismatch'])"
+            class="form-error"
+          >
+            <span *ngIf="f['confirmPassword'].errors?.['required']">请确认密码</span>
+            <span *ngIf="registerForm.errors?.['passwordMismatch']">两次输入的密码不一致</span>
+          </div>
+        </div>
+
+        <button
+          type="submit"
+          class="btn btn-primary btn-lg btn-block"
+          [disabled]="loading"
+        >
+          <span *ngIf="loading" class="spinner-small"></span>
+          {{ loading ? '注册中...' : '注册' }}
+        </button>
+      </form>
+
+      <div class="auth-footer">
+        已有账号？<a routerLink="/login">立即登录</a>
+      </div>
+    </div>
+
+    <div class="auth-side">
+      <div class="side-content">
+        <div class="side-icon">🏛️</div>
+        <h2 class="side-title">手办阁</h2>
+        <p class="side-desc">
+          个人手办电子橱窗<br />
+          分享你的收藏世界
+        </p>
+        <div class="side-features">
+          <div class="feature-item">
+            <span class="feature-icon">📷</span>
+            <span>上传多张手办图片</span>
+          </div>
+          <div class="feature-item">
+            <span class="feature-icon">🏷️</span>
+            <span>自定义分类标签</span>
+          </div>
+          <div class="feature-item">
+            <span class="feature-icon">🔒</span>
+            <span>设置展示状态</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
