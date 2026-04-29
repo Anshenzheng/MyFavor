@@ -200,7 +200,7 @@
               type="button"
               class="btn btn-outline btn-sm"
               *ngFor="let tag of tags"
-              (click)="if (!selectedTags.includes(tag.name)) selectedTags.push(tag.name)"
+              (click)="addSuggestedTag(tag.name)"
               [disabled]="selectedTags.includes(tag.name)"
             >
               {{ tag.name }}

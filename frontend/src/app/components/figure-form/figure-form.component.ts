@@ -152,6 +152,12 @@ export class FigureFormComponent implements OnInit {
     }
   }
 
+  addSuggestedTag(tagName: string): void {
+    if (!this.selectedTags.includes(tagName)) {
+      this.selectedTags.push(tagName);
+    }
+  }
+
   removeTag(tag: string): void {
     const index = this.selectedTags.indexOf(tag);
     if (index > -1) {
