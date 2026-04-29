@@ -157,39 +157,40 @@
   </div>
 
   <!-- Lightbox -->
-  <div
-    *ngIf="lightboxOpen && figure?.images"
-    class="lightbox-overlay"
-    (click)="closeLightbox()"
-  >
-    <div class="lightbox-content" (click)="$event.stopPropagation()">
-      <button class="lightbox-close" (click)="closeLightbox()">×</button>
+  <ng-container *ngIf="lightboxOpen && figure && figure.images; let f = figure">
+    <div
+      class="lightbox-overlay"
+      (click)="closeLightbox()"
+    >
+      <div class="lightbox-content" (click)="$event.stopPropagation()">
+        <button class="lightbox-close" (click)="closeLightbox()">×</button>
 
-      <button
-        class="lightbox-nav lightbox-prev"
-        (click)="prevImage()"
-        *ngIf="figure.images.length > 1"
-      >
-        ‹
-      </button>
+        <button
+          class="lightbox-nav lightbox-prev"
+          (click)="prevImage()"
+          *ngIf="f.images.length > 1"
+        >
+          ‹
+        </button>
 
-      <img
-        class="lightbox-image"
-        [src]="getImageUrl(figure.images[currentImageIndex])"
-        [alt]="figure.name"
-      />
+        <img
+          class="lightbox-image"
+          [src]="getImageUrl(f.images[currentImageIndex])"
+          [alt]="f.name"
+        />
 
-      <button
-        class="lightbox-nav lightbox-next"
-        (click)="nextImage()"
-        *ngIf="figure.images.length > 1"
-      >
-        ›
-      </button>
+        <button
+          class="lightbox-nav lightbox-next"
+          (click)="nextImage()"
+          *ngIf="f.images.length > 1"
+        >
+          ›
+        </button>
 
-      <div class="lightbox-counter" *ngIf="figure.images.length > 1">
-        {{ currentImageIndex + 1 }} / {{ figure.images.length }}
+        <div class="lightbox-counter" *ngIf="f.images.length > 1">
+          {{ currentImageIndex + 1 }} / {{ f.images.length }}
+        </div>
       </div>
     </div>
-  </div>
+  </ng-container>
 </div>
